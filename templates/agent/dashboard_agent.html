@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Agent{% endblock %}
+
+{% block content %}
+
+<h4 class="mb-4">Dashboard Agent Terrain</h4>
+
+
+<!-- KPI -->
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <h4 class="text-success">{{ total_projects }}</h4>
+            <p>Projets assignés</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <h4 class="text-primary">{{ total_beneficiaries }}</h4>
+            <p>Bénéficiaires enregistrés</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <h4 class="text-warning">{{ activities_this_month }}</h4>
+            <p>Activités réalisées</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- MES PROJETS -->
+<div class="mt-4">
+    <h5>Mes projets assignés</h5>
+
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Nom</th>
+                <th>Région</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.region }}</td>
+
+                <td>
+                    {% if project.status == "actif" %}
+                        <span class="badge bg-success">Actif</span>
+                    {% elif project.status == "en_cours" %}
+                        <span class="badge bg-warning text-dark">En cours</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Terminé</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">
+                    Aucun projet assigné
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 🔥 ACTIVITÉS RÉCENTES -->
+<div class="mt-4">
+    <h5>Activités récentes</h5>
+
+    <ul class="list-group">
+
+        {% for activity in recent_activities %}
+        <li class="list-group-item">
+
+            <strong>{{ activity.get_type_display }}</strong>  
+            - {{ activity.project.name }} <br>
+
+            <small class="text-muted">
+                {{ activity.description|truncatechars:40 }}
+            </small><br>
+
+            <small class="text-muted">
+                {{ activity.date }}
+            </small>
+
+        </li>
+        {% empty %}
+        <li class="list-group-item text-center">
+            Aucune activité pour le moment
+        </li>
+        {% endfor %}
+
+    </ul>
+</div>
+
+{% endblock %}

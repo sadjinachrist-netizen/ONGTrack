@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Rapports{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Gestion des rapports</h3>
+        <p class="text-muted">Suivi des rapports d’activités et projets</p>
+    </div>
+
+    <a href="{% url 'create_report' %}" class="btn btn-primary">
+        + Générer un rapport
+    </a>
+</div>
+
+<table class="table table-hover bg-white align-middle">
+
+    <thead class="table-light">
+        <tr>
+            <th>Titre</th>
+            <th>Projet</th>
+            <th>Activité</th> <!-- 🔥 NOUVEAU -->
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for r in reports %}
+        <tr>
+
+            <!-- Titre -->
+            <td>
+                <strong>{{ r.title }}</strong>
+            </td>
+
+            <!-- Projet -->
+            <td>
+                <span class="badge bg-success">
+                    {{ r.project.name }}
+                </span>
+            </td>
+
+            <!-- 🔥 ACTIVITÉ -->
+            <td>
+                {% if r.activity %}
+                    <span class="badge bg-primary">
+                        {{ r.activity.get_type_display }}
+                    </span>
+                {% else %}
+                    <span class="text-muted">Rapport global</span>
+                {% endif %}
+            </td>
+
+            <!-- Date -->
+            <td>{{ r.created_at|date:"d M Y" }}</td>
+
+            <!-- Statut -->
+            <td>
+                {% if r.status == "generated" %}
+                    <span class="badge bg-success">Généré</span>
+                {% else %}
+                    <span class="badge bg-secondary">Brouillon</span>
+                {% endif %}
+            </td>
+
+            <!-- Actions -->
+            <td>
+                <a href="{% url 'report_detail' r.id %}" 
+                   class="btn btn-sm btn-info" title="Voir le rapport">
+                   👁️
+                </a>
+            </td>
+
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">
+                Aucun rapport disponible
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}

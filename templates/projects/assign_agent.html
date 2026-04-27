@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Affecter agents{% endblock %}
+
+{% block content %}
+
+<h3>Affecter des agents</h3>
+
+<p><strong>Projet :</strong> {{ project.name }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button class="btn btn-success">Enregistrer</button>
+    <a href="{% url 'project_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+
+{% endblock %}

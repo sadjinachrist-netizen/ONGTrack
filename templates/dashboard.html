@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard Responsable
+{% endblock %}
+
+{% block content %}
+
+<!-- KPI -->
+<div class="row g-3">
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4 class="text-success">{{ total_projects }}</h4>
+            <small class="text-muted">Projets actifs</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4 class="text-primary">{{ total_beneficiaries }}</h4>
+            <small class="text-muted">Bénéficiaires</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4 class="text-warning">{{ activities_pending }}</h4>
+            <small class="text-muted">À valider</small>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 text-center">
+            <h4 class="text-danger">{{ total_activities }}</h4>
+            <small class="text-muted">Total activités</small>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🥇 MES PROJETS -->
+<div class="mt-4">
+    <h5>Mes projets</h5>
+
+    <div class="card p-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th style="width: 250px;">Progression</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>
+                        <a href="{% url 'project_detail' project.id %}">
+                            {{ project.name }}
+                        </a>
+                    </td>
+
+                    <!-- PROGRESSION -->
+                    <td>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar 
+                                {% if project.progress < 30 %}bg-danger
+                                {% elif project.progress < 70 %}bg-warning
+                                {% else %}bg-success{% endif %}"
+                                style="width: {{ project.progress }}%;">
+                            </div>
+                        </div>
+                        <small>{{ project.progress }}%</small>
+                    </td>
+
+                    <!-- STATUT -->
+                    <td>
+                        {% if project.status == "actif" %}
+                            <span class="badge bg-success">Actif</span>
+                        {% elif project.status == "en_cours" %}
+                            <span class="badge bg-warning text-dark">En cours</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Terminé</span>
+                        {% endif %}
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">Aucun projet disponible</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 📊 BÉNÉFICIAIRES PAR PROJET + GRAPH -->
+<div class="row mt-4">
+
+    <!-- TABLE -->
+    <div class="col-md-6">
+        <h5>Bénéficiaires par projet</h5>
+
+        <div class="card p-3">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>Projet</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in project_data %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.count }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center">Aucune donnée</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- GRAPH -->
+    <div class="col-md-6">
+        <h5>Graphique</h5>
+
+        <div class="card p-3">
+            <canvas id="beneficiaryChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🕒 ACTIVITÉS RÉCENTES -->
+<div class="mt-4">
+    <h5>Activités récentes</h5>
+
+    <div class="card p-3">
+        <ul class="list-group list-group-flush">
+            {% for a in recent_activities %}
+            <li class="list-group-item d-flex justify-content-between">
+                <span>{{ a.get_type_display }} - {{ a.project.name }}</span>
+
+                <span>
+                    {% if a.status == "valide" %}
+                        <span class="badge bg-success">Validé</span>
+                    {% elif a.status == "rejete" %}
+                        <span class="badge bg-danger">Rejeté</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    {% endif %}
+                </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item">Aucune activité récente</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- 🔥 SCRIPT GRAPH -->
+<script>
+    const labels = [
+        {% for item in project_data %}
+            "{{ item.name }}",
+        {% endfor %}
+    ];
+
+    const data = [
+        {% for item in project_data %}
+            {{ item.count }},
+        {% endfor %}
+    ];
+
+    const ctx = document.getElementById('beneficiaryChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Bénéficiaires',
+                data: data
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

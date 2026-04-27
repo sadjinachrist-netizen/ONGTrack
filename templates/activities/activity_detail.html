@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail activité{% endblock %}
+
+{% block content %}
+
+<div class="card p-4">
+
+    <h3>{{ activity.get_type_display }}</h3>
+
+    <hr>
+
+    <p><strong>Projet :</strong> {{ activity.project.name }}</p>
+    <p><strong>Agent :</strong> {{ activity.agent.username }}</p>
+    <p><strong>Date :</strong> {{ activity.date }}</p>
+
+    <p><strong>Description :</strong></p>
+    <p>{{ activity.description }}</p>
+
+    <!-- 🔥 RESULTAT -->
+    {% if activity.result %}
+        <p><strong>Résultat :</strong></p>
+        <p>{{ activity.result }}</p>
+    {% elif activity.status == "valide" and not user.is_superuser %}
+        <div class="alert alert-warning">
+            Aucun résultat renseigné pour cette activité.
+        </div>
+
+        <!-- 🔥 BOUTON REMPLIR RESULTAT -->
+        <a href="{% url 'update_activity' activity.id %}" 
+           class="btn btn-warning">
+           ✏️ Ajouter le résultat
+        </a>
+    {% endif %}
+
+    <!-- 🔥 STATUT -->
+    <p class="mt-3"><strong>Statut :</strong>
+        {% if activity.status == "valide" %}
+            <span class="badge bg-success">Validé</span>
+        {% elif activity.status == "rejete" %}
+            <span class="badge bg-danger">Rejeté</span>
+        {% else %}
+            <span class="badge bg-warning">En attente</span>
+        {% endif %}
+    </p>
+
+    <!-- 🔥 GENERER RAPPORT -->
+    {% if activity.status == "valide" and activity.result %}
+        <a href="{% url 'create_report' %}?activity={{ activity.id }}" 
+           class="btn btn-primary mt-3">
+           📄 Générer rapport
+        </a>
+    {% endif %}
+
+    <a href="{% url 'activity_list' %}" class="btn btn-secondary mt-3">
+        ⬅ Retour
+    </a>
+
+</div>
+
+{% endblock %}

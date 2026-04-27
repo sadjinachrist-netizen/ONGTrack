@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Bénéficiaires{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Gestion des bénéficiaires</h3>
+        <p class="text-muted">Suivi global des bénéficiaires</p>
+    </div>
+
+    <!-- 🔥 AJOUT = AGENT SEULEMENT -->
+    {% if not user.is_superuser %}
+    <a href="{% url 'create_beneficiary' %}" class="btn btn-success">
+        + Ajouter un bénéficiaire
+    </a>
+    {% endif %}
+</div>
+
+<!-- 🔍 + FILTRES FONCTIONNELS -->
+<form method="GET" class="mb-4" id="filterForm">
+
+    <!-- 🔍 RECHERCHE -->
+    <input 
+        type="text" 
+        name="q"
+        value="{{ request.GET.q }}"
+        class="form-control mb-3"
+        placeholder="Rechercher (nom, prénom, localisation)"
+        onkeyup="delaySubmit()"
+    >
+
+    <div class="row">
+
+        <!-- Projet -->
+        <div class="col-md-4">
+            <select name="project" class="form-select" onchange="submitForm()">
+                <option value="">Tous les projets</option>
+                {% for p in projects %}
+                    <option value="{{ p.id }}" 
+                        {% if request.GET.project == p.id|stringformat:"s" %}selected{% endif %}>
+                        {{ p.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Sexe -->
+        <div class="col-md-4">
+            <select name="gender" class="form-select" onchange="submitForm()">
+                <option value="">Sexe</option>
+                <option value="homme" {% if request.GET.gender == "homme" %}selected{% endif %}>Homme</option>
+                <option value="femme" {% if request.GET.gender == "femme" %}selected{% endif %}>Femme</option>
+            </select>
+        </div>
+
+        <!-- Région -->
+        <div class="col-md-4">
+            <input 
+                type="text" 
+                name="region"
+                value="{{ request.GET.region }}"
+                class="form-control"
+                placeholder="Filtrer par localisation"
+                onkeyup="delaySubmit()"
+            >
+        </div>
+
+    </div>
+
+</form>
+
+<!-- 🔥 SCRIPT UX -->
+<script>
+let timer;
+
+function delaySubmit() {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        document.getElementById('filterForm').submit();
+    }, 400);
+}
+
+function submitForm() {
+    document.getElementById('filterForm').submit();
+}
+</script>
+
+<script>
+window.onload = function() {
+    const input = document.querySelector('input[name="q"]');
+    
+    if (input) {
+        input.focus();
+
+        // remettre le curseur à la fin
+        const val = input.value;
+        input.value = '';
+        input.value = val;
+    }
+}
+</script>
+
+<!-- 📊 TABLE -->
+<table class="table table-hover align-middle bg-white">
+
+    <thead class="table-light">
+        <tr>
+            <th>Nom complet</th>
+            <th>Sexe</th>
+            <th>Âge</th>
+            <th>Localisation</th>
+            <th>Projet</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for b in beneficiaries %}
+        <tr>
+
+            <td>
+                <strong>{{ b.first_name }} {{ b.last_name }}</strong>
+            </td>
+
+            <td>
+                {% if b.gender == "homme" %}
+                    <span class="badge bg-primary">Homme</span>
+                {% else %}
+                    <span class="badge bg-danger">Femme</span>
+                {% endif %}
+            </td>
+
+            <td>{{ b.age }}</td>
+
+            <td>{{ b.region }}</td>
+
+            <td>
+                <span class="badge bg-success">
+                    {{ b.project.name }}
+                </span>
+            </td>
+
+            <td>
+
+                <!-- 🔵 VOIR -->
+                <a href="{% url 'beneficiary_detail' b.id %}" 
+                   class="btn btn-sm btn-info">👁️</a>
+
+                <!-- ✏️ MODIFIER = AGENT SEULEMENT -->
+                {% if not user.is_superuser %}
+                <a href="{% url 'update_beneficiary' b.id %}" 
+                   class="btn btn-sm btn-warning">✏️</a>
+                {% endif %}
+
+                <!-- 🔴 SUPPRIMER -->
+                <a href="{% url 'delete_beneficiary' b.id %}" 
+                   onclick="return confirm('Supprimer ce bénéficiaire ?')"
+                   class="btn btn-sm btn-danger">🗑️</a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">
+                Aucun bénéficiaire trouvé
+            </td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

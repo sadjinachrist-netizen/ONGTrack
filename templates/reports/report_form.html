@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Nouveau rapport{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h3 class="mb-4">Générer un rapport</h3>
+
+    <!-- 🔥 ERREURS -->
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <strong>Erreur :</strong>
+        {{ form.errors }}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+
+            <!-- Titre -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Titre</label>
+                {{ form.title }}
+            </div>
+
+            <!-- Projet -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Projet</label>
+                {{ form.project }}
+            </div>
+
+            <!-- 🔥 ACTIVITÉ (IMPORTANT) -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Activité</label>
+                {{ form.activity }}
+            </div>
+
+            <!-- Date début -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Date début</label>
+                {{ form.start_date }}
+            </div>
+
+            <!-- Date fin -->
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Date fin</label>
+                {{ form.end_date }}
+            </div>
+
+        </div>
+
+        <!-- Contenu -->
+        <div class="mb-3">
+            <label class="form-label">Contenu du rapport</label>
+            {{ form.content }}
+        </div>
+
+        <!-- Boutons -->
+        <button class="btn btn-success">Générer</button>
+        <a href="{% url 'report_list' %}" class="btn btn-secondary">Annuler</a>
+
+    </form>
+
+</div>
+
+{% endblock %}

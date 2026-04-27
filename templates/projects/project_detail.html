@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail Projet{% endblock %}
+
+{% block content %}
+
+<!-- 🧾 INFOS PROJET -->
+<div class="card p-3 mb-4">
+    <h3>{{ project.name }}</h3>
+
+    <p><strong>Région :</strong> {{ project.region }}</p>
+
+    <p>
+        <strong>Statut :</strong>
+        {% if project.status == "actif" %}
+            <span class="badge bg-success">Actif</span>
+        {% elif project.status == "en_cours" %}
+            <span class="badge bg-warning text-dark">En cours</span>
+        {% else %}
+            <span class="badge bg-secondary">Terminé</span>
+        {% endif %}
+    </p>
+
+    <p><strong>Description :</strong> {{ project.description }}</p>
+
+    <!-- 🔥 PROGRESSION -->
+    <p><strong>Progression :</strong></p>
+    <div class="progress mb-2" style="height: 10px;">
+        <div class="progress-bar 
+            {% if project.progress < 30 %}bg-danger
+            {% elif project.progress < 70 %}bg-warning
+            {% else %}bg-success{% endif %}"
+            style="width: {{ project.progress }}%;">
+        </div>
+    </div>
+    <small>{{ project.progress }}%</small>
+</div>
+
+<!-- 👥 AGENTS -->
+<div class="card p-3 mb-4">
+    <h5>Agents affectés</h5>
+
+    <ul class="list-group">
+        {% for agent in agents %}
+            <li class="list-group-item">{{ agent.username }}</li>
+        {% empty %}
+            <li class="list-group-item">Aucun agent affecté</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- 👥 BÉNÉFICIAIRES -->
+<div class="card p-3 mb-4">
+    <h5>Bénéficiaires</h5>
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Sexe</th>
+                <th>Âge</th>
+                <th>Localisation</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for b in beneficiaries %}
+            <tr>
+                <td>{{ b.first_name }} {{ b.last_name }}</td>
+                <td>{{ b.gender }}</td>
+                <td>{{ b.age }}</td>
+                <td>{{ b.region }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Aucun bénéficiaire</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 📊 ACTIVITÉS -->
+<div class="card p-3">
+    <h5>Activités</h5>
+
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for a in activities %}
+            <tr>
+                <td>{{ a.get_type_display }}</td>
+                <td>{{ a.description|truncatechars:30 }}</td>
+
+                <td>
+                    {% if a.status == "valide" %}
+                        <span class="badge bg-success">Validé</span>
+                    {% elif a.status == "rejete" %}
+                        <span class="badge bg-danger">Rejeté</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">En attente</span>
+                    {% endif %}
+                </td>
+
+                <td>{{ a.date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Aucune activité</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

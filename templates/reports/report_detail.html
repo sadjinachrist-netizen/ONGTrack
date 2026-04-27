@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Détail rapport{% endblock %}
+
+{% block content %}
+
+<h3>{{ report.title }}</h3>
+
+<p><strong>Projet :</strong> {{ report.project.name }}</p>
+<p><strong>Période :</strong> {{ report.start_date }} - {{ report.end_date }}</p>
+<p><strong>Date :</strong> {{ report.created_at }}</p>
+
+<hr>
+
+<a href="{% url 'export_report_pdf' report.id %}" 
+   class="btn btn-danger">
+   📄 Télécharger PDF
+</a>
+
+<p>{{ report.content }}</p>
+
+{% endblock %}

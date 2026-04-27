@@ -1,0 +1,16 @@
+<h2>{{ report.title }}</h2>
+
+<p><strong>Projet :</strong> {{ report.project.name }}</p>
+<p><strong>Période :</strong> {{ report.start_date }} - {{ report.end_date }}</p>
+<p><strong>Date :</strong> {{ report.created_at }}</p>
+
+<hr>
+
+<h3>Contenu du rapport</h3>
+
+<style>
+body { font-family: Arial; }
+h2 { color: #0b5d3b; }
+</style>
+
+<p>{{ report.content }}</p>

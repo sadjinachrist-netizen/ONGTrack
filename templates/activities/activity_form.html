@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Activité{% endblock %}
+
+{% block content %}
+
+<h3>Ajouter une activité</h3>
+
+{% if form.errors %}
+<div class="alert alert-danger">
+    {{ form.errors }}
+</div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Projet</label>
+        {{ form.project }}
+    </div>
+
+    <div class="mb-3">
+        <label>Type</label>
+        {{ form.type }}
+    </div>
+
+    <div class="mb-3">
+        <label>Description</label>
+        {{ form.description }}
+    </div>
+
+    <div class="mb-3">
+        <label>Résultat</label>
+        {{ form.result }}
+    </div>
+
+    <button class="btn btn-success">Enregistrer</button>
+</form>
+
+{% endblock %}

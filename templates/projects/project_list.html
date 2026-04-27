@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Projets{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Gestion des projets</h3>
+        <p class="text-muted">Supervisez vos initiatives terrain</p>
+    </div>
+
+    <a href="{% url 'create_project' %}" class="btn btn-success">
+        + Créer un projet
+    </a>
+</div>
+
+<!-- 🔍 Recherche FONCTIONNELLE -->
+<div class="mb-3">
+    <form method="GET">
+    <input 
+        type="text" 
+        id="searchInput"
+        name="q"
+        value="{{ request.GET.q }}"
+        class="form-control"
+        placeholder="Rechercher un projet..."
+        onkeyup="this.form.submit()"
+    >
+</form>
+
+<script>
+    window.onload = function() {
+        const input = document.getElementById("searchInput");
+        if (input.value.length > 0) {
+            input.focus();
+            input.setSelectionRange(input.value.length, input.value.length);
+        }
+    }
+</script>
+</div>
+
+<!-- 📊 TABLE -->
+<table class="table table-hover align-middle bg-white">
+
+    <thead class="table-light">
+        <tr>
+            <th>Nom</th>
+            <th>Catégorie</th>
+            <th>Région</th>
+            <th>Dates</th>
+            <th>Budget</th>
+            <th>Statut</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for project in projects %}
+        <tr>
+
+            <!-- 🔥 NOM CLIQUABLE -->
+            <td>
+                <strong>
+                    <a href="{% url 'project_detail' project.id %}">
+                        {{ project.name }}
+                    </a>
+                </strong><br>
+
+                <small class="text-muted">
+                    {{ project.description|truncatechars:40 }}
+                </small>
+            </td>
+
+            <td>{{ project.get_category_display }}</td>
+
+            <td>{{ project.region }}</td>
+
+            <td>
+                {{ project.start_date }} → {{ project.end_date }}
+            </td>
+
+            <td>{{ project.budget }} FCFA</td>
+
+            <td>
+                {% if project.status == "actif" %}
+                    <span class="badge bg-success">Actif</span>
+                {% elif project.status == "en_cours" %}
+                    <span class="badge bg-warning text-dark">En cours</span>
+                {% else %}
+                    <span class="badge bg-secondary">Terminé</span>
+                {% endif %}
+            </td>
+
+            <!-- 🔥 ACTIONS -->
+            <td>
+
+                <!-- 👥 Affecter -->
+                <a href="{% url 'assign_agent' project.id %}" 
+                   class="btn btn-sm btn-primary" title="Affecter des agents">
+                   👥
+                </a>
+
+                <!-- ✏️ Modifier -->
+                <a href="{% url 'update_project' project.id %}" 
+                   class="btn btn-sm btn-warning">✏️</a>
+
+                <!-- 🔒 Clôturer -->
+                {% if project.status != "termine" %}
+                <a href="{% url 'close_project' project.id %}" 
+                   onclick="return confirm('Clôturer ce projet ?')"
+                   class="btn btn-sm btn-secondary">✔</a>
+                {% endif %}
+
+                <!-- 🗑️ Supprimer -->
+                <a href="{% url 'delete_project' project.id %}" 
+                   onclick="return confirm('Supprimer ce projet ?')"
+                   class="btn btn-sm btn-danger">🗑️</a>
+
+            </td>
+
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td colspan="7" class="text-center">Aucun projet</td>
+        </tr>
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
